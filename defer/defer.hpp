@@ -21,6 +21,15 @@ namespace defer_ns {
     };
 }
 
-#define defer [[gnu::unused]] const auto& _local_defer__ ## __LINE__ = defer_ns::helper() << [&]()
+#if defined(__GNUC__) || defined(__clang__)
+#define _DEFER_UNUSED_ATTRIBUTE_ [[gnu::unused]]
+#else
+#define _DEFER_UNUSED_ATTRIBUTE_ [[maybe_unused]]
+#endif
+
+#define _defer_concat_macro_hack2(a, b) a ## b
+#define _defer_concat_macro_hack1(a, b) _defer_concat_macro_hack2(a, b)
+#define defer \
+    _DEFER_UNUSED_ATTRIBUTE_ const auto& _defer_concat_macro_hack1(__defer_autoval_for_line_, __LINE__) = defer_ns::helper() << [&]()
 
 #endif
