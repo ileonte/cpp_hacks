@@ -1,8 +1,6 @@
 #ifndef __CPP_HACK_DEFER_H_INCLUDED__
 #define __CPP_HACK_DEFER_H_INCLUDED__
 
-#include <utility>
-
 namespace defer_ns {
     class helper {
     public:
@@ -11,7 +9,6 @@ namespace defer_ns {
         public:
             helper_impl(Callable c) : call_(c) {}
             ~helper_impl() { call_(); }
-            helper_impl(helper_impl&& o) : call_(std::move(o.call_)) {}
         private:
             Callable call_;
         };
@@ -22,14 +19,16 @@ namespace defer_ns {
 }
 
 #if defined(__GNUC__) || defined(__clang__)
-#define _DEFER_UNUSED_ATTRIBUTE_ [[gnu::unused]]
+#define _DEFERHACK_UNUSED_ATTR_DEF_ [[gnu::unused]]
 #else
-#define _DEFER_UNUSED_ATTRIBUTE_ [[maybe_unused]]
+#define _DEFERHACK_UNUSED_ATTR_DEF_ [[maybe_unused]]
 #endif
 
-#define _defer_concat_macro_hack2(a, b) a ## b
-#define _defer_concat_macro_hack1(a, b) _defer_concat_macro_hack2(a, b)
+#define _deferhack_cathack_2(a, b) a ## b
+#define _deferhack_cathack_1(a, b) _deferhack_cathack_2(a, b)
 #define defer \
-    _DEFER_UNUSED_ATTRIBUTE_ const auto& _defer_concat_macro_hack1(__defer_autoval_for_line_, __LINE__) = defer_ns::helper() << [&]()
+    _DEFERHACK_UNUSED_ATTR_DEF_ \
+    const auto& _deferhack_cathack_1(_deferhack_val_for_line_, __LINE__) = \
+        defer_ns::helper() << [&]()
 
-#endif
+#endif  /* __CPP_HACK_DEFER_H_INCLUDED__ */
