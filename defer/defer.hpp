@@ -13,8 +13,13 @@ namespace defer_ns {
             Callable call_;
         };
 
+        static const helper& instance() {
+            static helper g_instance;
+            return g_instance;
+        }
+
         template <typename Callable>
-        helper_impl<Callable> operator<<(Callable c) { return c; }
+        helper_impl<Callable> operator<<(Callable c) const { return c; }
     };
 }
 
@@ -29,6 +34,6 @@ namespace defer_ns {
 #define defer \
     _DEFERHACK_UNUSED_ATTR_DEF_ \
     const auto& _deferhack_cathack_1(_deferhack_val_for_line_, __LINE__) = \
-        defer_ns::helper() << [&]()
+        defer_ns::helper::instance() << [&]()
 
 #endif  /* __CPP_HACK_DEFER_H_INCLUDED__ */

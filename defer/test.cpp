@@ -2,7 +2,11 @@
 #include <cstdlib>
 #include "defer.hpp"
 
-#define out(fmt, ...) std::printf("[%3d] " fmt "\n", __LINE__, ##__VA_ARGS__)
+#define FMT_HEADER_ONLY
+#include "../fmt/format.h"
+using namespace fmt::literals;
+
+#define out fmt::print
 
 struct S_type {
     int x = 1;
@@ -10,40 +14,43 @@ struct S_type {
     int z = 3;
 };
 
+static inline void format_arg(fmt::BasicFormatter<char> &f, const char *&, const S_type& s)
+{
+    f.writer().write("{{{}, {}, {}}}", s.x, s.y, s.z);
+}
+
 int main()
 {
     void *p = std::malloc(1024);
-    [[gnu::unused]] long l = 0x0102030405l;
-    [[gnu::unused]] S_type s;
+    long l = 0x0102030405l;
+    S_type s;
 
     defer {
-        out("> p = %p", p);
-        out("> s = {%d, %d, %d}", s.x, s.y, s.z);
-        out("> Done with program");
+        auto fs = "> p = {:0<16p}\n> s = {}"_format(p, s);
+        out("{}\n", fs);
+        out("> Done with program\n");
     };
 
     defer {
-        out("> SECOND top-level defer");
+        out("> SECOND top-level defer\n");
     };
-
-    out("%zd", sizeof(_deferhack_val_for_line_19));
 
     {
         defer {
             std::free(p);
             p = nullptr;
-            out(">>> l = %lx", l);
-            out(">>> Done with scope");
+            out(">>> l = {:x}\n", l);
+            out(">>> Done with scope\n");
         };
 
-        out(">>");
-        out(">> In scope");
-        out(">>");
+        out(">>\n");
+        out(">> In scope\n");
+        out(">>\n");
     }
 
-    out("");
-    out("Main program");
-    out("");
+    out("\n");
+    out("Main program\n");
+    out("\n");
 
     return 0;
 }
