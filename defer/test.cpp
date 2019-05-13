@@ -1,10 +1,14 @@
-#include <cstdio>
-#include <cstdlib>
+#if defined(PULL_IN_STL)
+#include <sstream>
+#include <string>
+#endif
+
 #include "defer.hpp"
 
 #define FMT_HEADER_ONLY
+#define FMT_USE_NOEXCEPT 1
+#define FMT_USE_USER_DEFINED_LITERALS 0
 #include "../fmt/format.h"
-using namespace fmt::literals;
 
 #define out fmt::print
 
@@ -25,9 +29,14 @@ int main()
     long l = 0x0102030405l;
     S_type s;
 
+#if defined(PULL_IN_STL)
+    std::stringstream ss;
+    ss << "This is a (" << l << ") test";
+    out("{}\n", ss.str());
+#endif
+
     defer {
-        auto fs = "> p = {:0<16p}\n> s = {}"_format(p, s);
-        out("{}\n", fs);
+        out("> p = {:0<16p}\n> s = {}\n", p, s);
         out("> Done with program\n");
     };
 
